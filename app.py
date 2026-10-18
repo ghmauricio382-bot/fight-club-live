@@ -69,7 +69,10 @@ st.markdown(
     </style>
     """,
     unsafe_allow_html=True,
-)HOUSE_SHARE_RATE = 0.07  # Fixed simulation parameter; not editable in the UI.
+)
+
+HOUSE_SHARE_RATE = 0.07  # Fixed simulation parameter; not editable in the UI.
+
 DEFAULT_STATE = {
     "fighter_a": "Marcus",
     "fighter_b": "Leo",
