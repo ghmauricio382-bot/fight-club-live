@@ -5,7 +5,7 @@ from supabase import create_client
 
 # FightClub Live — hypothetical simulation only. No real money or payments.
 st.set_page_config(page_title="FightClub Live", page_icon="🥊", layout="wide")
-ALI_BACKGROUND = "https://i.pinimg.com/736x/04/1a/cb/041acbb0cf32b5e580a19fe79de91ae8.jpg"
+ALI_BACKGROUND = "https://img.gallerix.com/product/4280_29567.jpg?width=1080&height=1080&mode=fit&enlarge=true"
 st.markdown(
     f"""
     <style>
