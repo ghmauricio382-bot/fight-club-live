@@ -161,11 +161,19 @@ if view == "⚡ Live Public Dashboard":
                 matched = [item for item in entries if item.get("target") == fighter_name]
                 if not matched:
                     st.caption("No points activity yet.")
-                for item in reversed(matched[-10:]):
-                    st.write(
-                        f"• **{item.get('name', 'Participant')}** — "
-                        f"{int(item.get('points', 0))} points"
+                for item in reversed(matched[-20:]):
+                    result_label = str(item.get("result", "PENDING")).upper()
+                    points_amount = int(item.get("points", 0))
+                    line = (
+                        f"**{item.get('name', 'Participant')}** — "
+                        f"{points_amount:,} points · {result_label}"
                     )
+                    if result_label == "WIN":
+                        st.markdown(f":green[{line}]")
+                    elif result_label == "LOSE":
+                        st.markdown(f":red[{line}]")
+                    else:
+                        st.write(line)
 
     live_dashboard()
 
@@ -242,6 +250,8 @@ elif view == "🔒 Admin Control":
         with st.form("add_fighter", clear_on_submit=True):
             name = st.text_input("Name")
             grade = st.selectbox("Grade (optional)", ["", "9", "10", "11", "12"])
+            height = st.text_input("Height (e.g. 5 ft 10 in)")
+            weight = st.text_input("Weight (e.g. 155 lb)")
             points = st.number_input("Starting ranking points", min_value=0, value=100, step=1)
             add_fighter = st.form_submit_button("Add fighter")
         if add_fighter:
@@ -250,9 +260,13 @@ elif view == "🔒 Admin Control":
             elif any(f.get("Name", "").casefold() == name.strip().casefold() for f in state["fighter_roster"]):
                 st.warning("That fighter is already on the roster.")
             else:
-                fighter = {"Name": name.strip(), "Points": int(points)}
-                if grade:
-                    fighter["Grade"] = grade
+                fighter = {
+                    "Name": name.strip(),
+                    "Points": int(points),
+                    "Grade": grade,
+                    "Height": height.strip(),
+                    "Weight": weight.strip(),
+                }
                 state["fighter_roster"].append(fighter)
                 save_state(state)
                 st.success("Fighter added.")
@@ -275,6 +289,7 @@ elif view == "🔒 Admin Control":
         participant = st.text_input("Participant name")
         target = st.radio("Choose fighter", [state["fighter_a"], state["fighter_b"]], horizontal=True)
         points_value = st.number_input("Points", min_value=1, max_value=1000, value=10, step=1)
+        result_value = st.selectbox("Activity result", ["PENDING", "WIN", "LOSE"])
         record_points = st.form_submit_button("Record points")
     if record_points:
         if not participant.strip():
@@ -284,6 +299,7 @@ elif view == "🔒 Admin Control":
                 "name": participant.strip(),
                 "target": target,
                 "points": int(points_value),
+                "result": result_value,
                 "created_at": datetime.now(timezone.utc).isoformat(),
             }
             state["points_entries"].append(entry)
@@ -319,4 +335,6 @@ elif view == "🗂️ Fighter Profiles":
                 c1, c2 = st.columns(2)
                 c1.write(f"**Grade:** {grade or 'Not provided'}")
                 c2.write(f"**Ranking points:** {fighter.get('Points', 0)}")
-                # Avoid collecting or publicly displaying age, height, or weight by default.
+                c3, c4 = st.columns(2)
+                c3.write(f"**Height:** {fighter.get('Height') or 'Not provided'}")
+                c4.write(f"**Weight:** {fighter.get('Weight') or 'Not provided'}")
