@@ -5,7 +5,7 @@ from supabase import create_client
 
 # FightClub Live — hypothetical simulation only. No real money or payments.
 st.set_page_config(page_title="FightClub Live", page_icon="🥊", layout="wide")
-ALI_BACKGROUND = "https://www.ocregister.com/wp-content/uploads/2017/06/ap_6505250172.jpg"
+ALI_BACKGROUND = "https://i.pinimg.com/736x/04/1a/cb/041acbb0cf32b5e580a19fe79de91ae8.jpg"
 st.markdown(
     f"""
     <style>
@@ -210,9 +210,9 @@ except Exception as exc:
 
 if view == "⚡ Live Public Dashboard":
     st.title("🥊 FightClub Live")
-    st.caption("Hypothetical simulation only · live updates every 0.5 seconds")
+    st.caption("Hypothetical simulation only · live updates every 0.1 seconds")
 
-    @st.fragment(run_every=0.5)
+    @st.fragment(run_every=0.1)
     def live_dashboard():
         current = load_state()
         entries = current["points_entries"]
