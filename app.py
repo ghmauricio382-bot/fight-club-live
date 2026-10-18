@@ -5,8 +5,71 @@ from supabase import create_client
 
 # FightClub Live — hypothetical simulation only. No real money or payments.
 st.set_page_config(page_title="FightClub Live", page_icon="🥊", layout="wide")
+ALI_BACKGROUND = "https://www.ocregister.com/wp-content/uploads/2017/06/ap_6505250172.jpg"
+st.markdown(
+    f"""
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Oswald:wght@400;500;600&display=swap');
 
-HOUSE_SHARE_RATE = 0.07  # Fixed simulation parameter; not editable in the UI.
+    .stApp {{
+        background: #171310;
+        color: #E8DCC4;
+    }}
+
+    .stApp::before {{
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        background:
+            linear-gradient(rgba(18,14,11,.70), rgba(18,14,11,.86)),
+            url("{ALI_BACKGROUND}") center center / cover no-repeat;
+    }}
+
+    [data-testid="stAppViewContainer"],
+    [data-testid="stHeader"],
+    [data-testid="stSidebar"] {{
+        background: transparent;
+    }}
+
+    [data-testid="stMain"] {{
+        position: relative;
+        z-index: 1;
+    }}
+
+    h1, h2, h3 {{
+        font-family: 'Cormorant Garamond', serif !important;
+        color: #E8DCC4 !important;
+    }}
+
+    [data-testid="stVerticalBlockBorderWrapper"] {{
+        background: rgba(30,23,17,.82);
+        border: 1px solid rgba(184,151,103,.68);
+        border-radius: 8px;
+    }}
+
+    [data-testid="stMetric"] {{
+        background: rgba(35,27,20,.78);
+        border: 1px solid #69533E;
+        border-radius: 8px;
+        padding: 14px;
+    }}
+
+    [data-testid="stSidebar"] {{
+        border-right: 1px solid #493526;
+    }}
+
+    .stButton > button {{
+        border: 1px solid #A98A5D;
+        background: rgba(50,37,26,.9);
+        color: #F0E4CD;
+        border-radius: 5px;
+    }}
+    </style>
+    """,
+    unsafe_allow_html=True,
+)HOUSE_SHARE_RATE = 0.07  # Fixed simulation parameter; not editable in the UI.
 DEFAULT_STATE = {
     "fighter_a": "Marcus",
     "fighter_b": "Leo",
