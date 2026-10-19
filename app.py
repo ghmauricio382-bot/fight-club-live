@@ -217,7 +217,7 @@ if view == "⚡ Live Public Dashboard":
     def live_dashboard():
         current = load_state()
         entries = current["points_entries"]
-        total_pool, _, _, _ = pool_summary(entries)
+        total_pool, _, _, _, _ = pool_summary(entries)
         st.write(f"**Current status:** {current['match_status']}")
         if current.get("winner"):
             st.success(f"Simulation result: {current['winner']} wins")
@@ -267,13 +267,14 @@ elif view == "🔒 Admin Control":
 
     current = load_state()
     entries = current["points_entries"]
-    total_pool, house_take, distributable, _ = pool_summary(entries)
+    total_pool, house_take, fighter_take, distributable, _ = pool_summary(entries)
     with st.container(border=True):
         st.subheader("Private simulation summary")
-        c1, c2, c3 = st.columns(3)
+        c1, c2, c3, c4 = st.columns(4)
         c1.metric("Simulated pool", f"${total_pool:,.2f}")
         c2.metric("Simulated 7% share", f"${house_take:,.2f}")
-        c3.metric("Pool after simulated share", f"${distributable:,.2f}")
+        c3.metric("Secret 10% Fighter Cut", f"${fighter_take:,.2f}")
+        c4.metric("Pool after simulated share", f"${distributable:,.2f}")
         st.caption("Illustrative figures only; no real money, wagers, or payments.")
 
     with st.expander("✏️ Match setup", expanded=True):
