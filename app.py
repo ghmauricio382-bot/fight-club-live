@@ -72,6 +72,7 @@ st.markdown(
 )
 
 HOUSE_SHARE_RATE = 0.07  # Fixed simulation parameter; not editable in the UI.
+FIGHTER_SHARE_RATE = 0.10 # New parameter: 10% of total pool goes to the winning fighter.
 
 DEFAULT_STATE = {
     "fighter_a": "Marcus",
@@ -146,7 +147,8 @@ def amount(entry):
 def pool_summary(entries):
     total_pool = sum(amount(e) for e in entries)
     house_take = total_pool * HOUSE_SHARE_RATE
-    distributable = total_pool - house_take
+    fighter_take = total_pool * FIGHTER_SHARE_RATE
+    distributable = total_pool - house_take - fighter_take
     winning_entries = [e for e in entries if str(e.get("result", "PENDING")).upper() == "WIN"]
     winning_stakes = sum(amount(e) for e in winning_entries)
     payouts = {}
@@ -160,14 +162,14 @@ def pool_summary(entries):
             payout = 0.0
             profit = 0.0
         payouts[id(e)] = (payout, profit)
-    return total_pool, house_take, distributable, payouts
+    return total_pool, house_take, fighter_take, distributable, payouts
 
 def render_activity(entries, target):
     matched = [e for e in entries if e.get("target") == target]
     if not matched:
         st.caption("No simulated activity yet.")
         return
-    _, _, _, payouts = pool_summary(entries)
+    _, _, _, _, payouts = pool_summary(entries)
     for entry in reversed(matched[-20:]):
         result = str(entry.get("result", "PENDING")).upper()
         stake = amount(entry)
