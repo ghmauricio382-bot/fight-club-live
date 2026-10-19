@@ -138,7 +138,6 @@ def format_clock(seconds):
     return f"{minutes:02d}:{secs:02d}.{tenths}"
 
 def amount(entry):
-    # Supports old entries made with the previous points-only version.
     try:
         return max(0.0, float(entry.get("stake", entry.get("points", 0))))
     except (TypeError, ValueError):
@@ -276,18 +275,25 @@ elif view == "🔒 Admin Control":
         st.caption("Illustrative figures only; no real money, wagers, or payments.")
 
     with st.expander("✏️ Match setup", expanded=True):
-        with st.form("match_setup"):
-            fighter_a = st.text_input("Red fighter", value=current["fighter_a"])
-            fighter_b = st.text_input("Blue fighter", value=current["fighter_b"])
-            save_names = st.form_submit_button("Save fighter names")
-        if save_names:
-            if not fighter_a.strip() or not fighter_b.strip() or fighter_a.strip() == fighter_b.strip():
-                st.warning("Enter two different fighter names.")
-            else:
-                current["fighter_a"], current["fighter_b"] = fighter_a.strip(), fighter_b.strip()
-                save_state(current)
-                st.success("Fighter names saved.")
-                st.rerun()
+        roster_names = [f.get("Name") for f in current["fighter_roster"]]
+        if not roster_names:
+            st.warning("Please add fighters to the roster first before setting up a match.")
+        else:
+            default_a = current["fighter_a"] if current["fighter_a"] in roster_names else roster_names[0]
+            default_b = current["fighter_b"] if current["fighter_b"] in roster_names and current["fighter_b"] != default_a else (roster_names[1] if len(roster_names) > 1 else roster_names[0])
+            
+            with st.form("match_setup"):
+                fighter_a = st.selectbox("Red fighter", roster_names, index=roster_names.index(default_a) if default_a in roster_names else 0)
+                fighter_b = st.selectbox("Blue fighter", roster_names, index=roster_names.index(default_b) if default_b in roster_names else (1 if len(roster_names) > 1 else 0))
+                save_names = st.form_submit_button("Save fighter names")
+            if save_names:
+                if fighter_a == fighter_b:
+                    st.warning("Red and Blue fighters must be different people.")
+                else:
+                    current["fighter_a"], current["fighter_b"] = fighter_a, fighter_b
+                    save_state(current)
+                    st.success("Fighter names saved.")
+                    st.rerun()
 
     st.subheader("⏱️ Match clock controls")
     c1, c2, c3 = st.columns(3)
@@ -310,7 +316,7 @@ elif view == "🔒 Admin Control":
 
     @st.dialog("End match and calculate simulation results")
     def choose_winner_dialog():
-        st.write("Select the winner. All pending fictional entries will be calculated automatically.")
+        st.write("Select the winner. All pending fictional entries and fighter ranking points will be updated automatically.")
         winner_choice = st.radio(
             "Who won?",
             [current["fighter_a"], current["fighter_b"]],
@@ -324,8 +330,20 @@ elif view == "🔒 Admin Control":
             current["fight_start_time"] = None
             current["match_status"] = "MATCH ENDED"
             current["winner"] = winner_choice
+            
+            # Update points entries
             for entry in current["points_entries"]:
                 entry["result"] = "WIN" if entry.get("target") == winner_choice else "LOSE"
+            
+            # Update fighter roster points (+25 for winner, -15 for loser)
+            loser_choice = current["fighter_b"] if winner_choice == current["fighter_a"] else current["fighter_a"]
+            for fighter in current["fighter_roster"]:
+                name = fighter.get("Name")
+                if name == winner_choice:
+                    fighter["Points"] = int(fighter.get("Points", 100)) + 25
+                elif name == loser_choice:
+                    fighter["Points"] = max(0, int(fighter.get("Points", 100)) - 15)
+
             save_state(current)
             st.session_state["show_winner_dialog"] = False
             st.rerun()
