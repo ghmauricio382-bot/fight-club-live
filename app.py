@@ -211,9 +211,9 @@ except Exception as exc:
 
 if view == "⚡ Live Public Dashboard":
     st.title("🥊 FightClub Live")
-    st.caption("Hypothetical simulation only · live updates every 0.4 seconds")
+    st.caption("Hypothetical simulation only · live updates every 0.2 seconds")
 
-    @st.fragment(run_every=0.4)
+    @st.fragment(run_every=0.2)
     def live_dashboard():
         current = load_state()
         entries = current["points_entries"]
